@@ -1,13 +1,15 @@
 import express, { Application } from "express"
 const app:Application = express();
 app.use(express.json())
-import bookRouter from "./apps/controllers/book.controller"
+import { router } from "./apps/controllers/book.controller";
+import { borrowRouter } from "./apps/controllers/borrow.controller";
 
 
 app.get('/', (req, res)=>{
     res.send("Hi, world!")
 })
 
-app.use('/', bookRouter)
+app.use('/', router)
+app.use('/borrow', borrowRouter)
 
 export default app;

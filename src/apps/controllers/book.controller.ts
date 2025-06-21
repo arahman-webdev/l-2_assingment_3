@@ -1,15 +1,122 @@
-import express, { Request, Response } from "express"
-const router = express.Router()
+import express, { Request, Response, Router } from "express"
+import { Book } from "../models/book.model"
+export const router = express.Router()
 
 
-router.post("/create", (req:Request, res:Response)=>{
+router.post("/create", async (req: Request, res: Response) => {
     try {
-        res.send("Creating a data into it")
-        console.log("Done")
-    } catch (error) {
-        console.log("error from creating post",error)
+        // const newBook = new Book({
+        //     title: "The Theory of Everything",
+        //     author: "Stephen Hawking",
+        //     genre: "SCIENCE",
+        //     isbn: "9780553380163",
+        //     description: "An overview of cosmology and black holes.",
+        //     copies: 5,
+        //     available: true
+        // })
+
+        const newBook = new Book(req.body)
+
+        const savedBook = await newBook.save()
+
+
+
+        res.status(201).json({
+            success: true,
+            message: "Book created successfully",
+            data: savedBook
+        })
+    } catch (error: any) {
+        console.log("error from creating post", error)
+
+        res.status(404).json({
+            message: "Validation failed",
+            success: false,
+            error
+        })
     }
 })
 
 
-export default router;
+router.get('/all-books', async (req, res) => {
+    try {
+
+
+        const { genre } = req.query;
+        const filterByGenre = genre ? { genre } : {}
+        const books = await Book.find(filterByGenre).sort({ title: -1 }).limit(5)
+
+        console.log(books)
+        res.status(201).json({
+            success: true,
+            message: "Books retrieved successfully",
+            data: books,
+
+        })
+    } catch (error) {
+        console.log(error)
+    }
+})
+
+router.get('/book/:id', async (req, res) => {
+    try {
+        const bookId = req.params.id;
+
+        const singleBook = await Book.findById(bookId)
+        console.log(singleBook)
+        res.status(201).json({
+            success: true,
+            message: "Books retrieved successfully",
+            data: singleBook,
+
+        })
+
+    } catch (error: any) {
+        console.log(error.message)
+    }
+})
+
+
+// update a book using id
+
+router.put('/book/:id', async (req, res) => {
+
+    try {
+        const filter = req.params.id;
+        const update = { copies: 100 };
+
+        const updateBook = await Book.findByIdAndUpdate(filter, update, {
+            new: true
+        })
+
+        res.status(201).json({
+            success: true,
+            message: "Book updated successfully",
+            data: updateBook,
+        })
+    } catch (error: any) {
+        console.log(error.message)
+    }
+
+})
+
+
+// remove a book 
+
+router.delete('/books/:bookId', async (req, res) => {
+
+    try {
+        const bookId = req.params.bookId;
+
+        const deleteBook = await Book.findByIdAndDelete(bookId)
+
+        res.status(200).json({
+            success: true,
+            message: "Book deleted successfully",
+            data: deleteBook
+        })
+    } catch (error) {
+        console.log(error)
+    }
+
+})
