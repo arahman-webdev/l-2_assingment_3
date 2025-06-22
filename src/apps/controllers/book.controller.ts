@@ -5,21 +5,10 @@ export const router = express.Router()
 
 router.post("/api/books", async (req: Request, res: Response) => {
     try {
-        // const newBook = new Book({
-        //     title: "The Theory of Everything",
-        //     author: "Stephen Hawking",
-        //     genre: "SCIENCE",
-        //     isbn: "9780553380163",
-        //     description: "An overview of cosmology and black holes.",
-        //     copies: 5,
-        //     available: true
-        // })
 
         const newBook = new Book(req.body)
 
         const savedBook = await newBook.save()
-
-
 
         res.status(201).json({
             success: true,
@@ -38,14 +27,14 @@ router.post("/api/books", async (req: Request, res: Response) => {
 })
 
 
-router.get('/api/books', async (req, res) => {
+router.get('/api/books', async (req: Request, res: Response) => {
     try {
 
         const { genre } = req.query;
         const filterByGenre = genre ? { genre } : {}
         const books = await Book.find(filterByGenre).sort({ title: -1 }).limit(5)
 
-        console.log(books)
+        
         res.status(201).json({
             success: true,
             message: "Books retrieved successfully",
@@ -57,7 +46,7 @@ router.get('/api/books', async (req, res) => {
     }
 })
 
-router.get('/api/books/:bookId', async (req, res) => {
+router.get('/api/books/:bookId', async (req: Request, res: Response) => {
     try {
         const query = req.params.bookId;
 
@@ -78,7 +67,7 @@ router.get('/api/books/:bookId', async (req, res) => {
 
 // update a book using id
 
-router.put('/api/books/:bookId', async (req, res) => {
+router.put('/api/books/:bookId', async (req: Request, res: Response) => {
 
     try {
         const filter = req.params.bookId;
@@ -102,7 +91,7 @@ router.put('/api/books/:bookId', async (req, res) => {
 
 // remove a book 
 
-router.delete('/api/books/:bookId', async (req, res) => {
+router.delete('/api/books/:bookId', async (req: Request, res: Response) => {
 
     try {
         const bookId = req.params.bookId;

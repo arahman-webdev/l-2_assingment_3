@@ -52,6 +52,19 @@ bookSchema.statics.updateQuantity = async function (bookId: Types.ObjectId, quan
     await book.save()
 }
 
+// pre middleware hook -----------
+bookSchema.pre("save", function (next) {
+    console.log("A book information is saved");
+    next()
+})
+
+// post middleware hook -----------
+
+bookSchema.post("save", function (doc, next) {
+  console.log(`Book saved: ${doc.isbn}`);
+  next()
+});
+
 
 
 export const Book = model<IBook, Model<IBook> & IBookStaticMethod>("Book", bookSchema);
