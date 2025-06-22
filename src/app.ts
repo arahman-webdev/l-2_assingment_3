@@ -10,6 +10,6 @@ app.get('/', (req, res)=>{
 })
 
 app.use('/', router)
-app.use('/borrow', borrowRouter)
+app.use('/', borrowRouter)
 
 export default app;

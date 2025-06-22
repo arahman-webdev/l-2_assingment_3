@@ -19,7 +19,7 @@ const PORT = 5000;
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            yield mongoose_1.default.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_KEY}@cluster0.aif7qmj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`)
+            yield mongoose_1.default.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_KEY}@cluster0.aif7qmj.mongodb.net/library-management?retryWrites=true&w=majority&appName=Cluster0`)
                 .then(() => {
                 console.log("Connected to MongoDB");
             })

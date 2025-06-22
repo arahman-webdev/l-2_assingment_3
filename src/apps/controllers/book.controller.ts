@@ -3,7 +3,7 @@ import { Book } from "../models/book.model"
 export const router = express.Router()
 
 
-router.post("/create", async (req: Request, res: Response) => {
+router.post("/api/books", async (req: Request, res: Response) => {
     try {
         // const newBook = new Book({
         //     title: "The Theory of Everything",
@@ -38,9 +38,8 @@ router.post("/create", async (req: Request, res: Response) => {
 })
 
 
-router.get('/all-books', async (req, res) => {
+router.get('/api/books', async (req, res) => {
     try {
-
 
         const { genre } = req.query;
         const filterByGenre = genre ? { genre } : {}
@@ -58,11 +57,11 @@ router.get('/all-books', async (req, res) => {
     }
 })
 
-router.get('/book/:id', async (req, res) => {
+router.get('/api/books/:bookId', async (req, res) => {
     try {
-        const bookId = req.params.id;
+        const query = req.params.bookId;
 
-        const singleBook = await Book.findById(bookId)
+        const singleBook = await Book.findById(query)
         console.log(singleBook)
         res.status(201).json({
             success: true,
@@ -79,10 +78,10 @@ router.get('/book/:id', async (req, res) => {
 
 // update a book using id
 
-router.put('/book/:id', async (req, res) => {
+router.put('/api/books/:bookId', async (req, res) => {
 
     try {
-        const filter = req.params.id;
+        const filter = req.params.bookId;
         const update = { copies: 100 };
 
         const updateBook = await Book.findByIdAndUpdate(filter, update, {
@@ -103,7 +102,7 @@ router.put('/book/:id', async (req, res) => {
 
 // remove a book 
 
-router.delete('/books/:bookId', async (req, res) => {
+router.delete('/api/books/:bookId', async (req, res) => {
 
     try {
         const bookId = req.params.bookId;

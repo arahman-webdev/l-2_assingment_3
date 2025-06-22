@@ -36,28 +36,27 @@ const bookSchema = new Schema<IBook>({
   }
 }, { timestamps: true, versionKey: false });
 
-//  Add static method
-bookSchema.statics.updateQuantity = async function (
-  bookId: Types.ObjectId,
-  quantity: number
-) {
+
+// static method applied here
+bookSchema.statics.updateQuantity = async function (bookId: Types.ObjectId, quantity: number) {
   const book = await this.findById(bookId);
 
-  if (book.copies < quantity) throw new Error("Not enough copies");
+  if(book.copies < quantity) throw new Error("Not enough copies")
+  
+    book.copies = book.copies - quantity;
 
-  book.copies = book.copies - quantity;
+    if(book.copies === 0){
+      book.available = false
+    }
 
-  if (book.copies === 0) {
-    book.available = false;
-  }
-
-  await book.save();
-};
+    await book.save()
+}
 
 
-export const Book = model<IBook, Model<IBook, {}, IBookStaticMethod>>("Book", bookSchema);
 
-// export const Book = mongoose.model<IBook, IBookStaticMethod>('Book', bookSchema)
+export const Book = model<IBook, Model<IBook> & IBookStaticMethod>("Book", bookSchema);
+
+
 
 
 
