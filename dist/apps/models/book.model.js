@@ -44,7 +44,7 @@ const bookSchema = new mongoose_1.Schema({
         default: true
     }
 }, { timestamps: true, versionKey: false });
-//  Add static method
+// static method applied here
 bookSchema.statics.updateQuantity = function (bookId, quantity) {
     return __awaiter(this, void 0, void 0, function* () {
         const book = yield this.findById(bookId);
@@ -57,4 +57,14 @@ bookSchema.statics.updateQuantity = function (bookId, quantity) {
         yield book.save();
     });
 };
+// pre middleware hook -----------
+bookSchema.pre("save", function (next) {
+    console.log("A book information is saved");
+    next();
+});
+// post middleware hook -----------
+bookSchema.post("save", function (doc, next) {
+    console.log(`Book saved: ${doc.isbn}`);
+    next();
+});
 exports.Book = (0, mongoose_1.model)("Book", bookSchema);

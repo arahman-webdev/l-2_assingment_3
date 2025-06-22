@@ -16,8 +16,7 @@ router.post("/api/books", async (req: Request, res: Response) => {
             data: savedBook
         })
     } catch (error: any) {
-        console.log("error from creating post", error)
-
+        
         res.status(404).json({
             message: "Validation failed",
             success: false,
@@ -27,32 +26,37 @@ router.post("/api/books", async (req: Request, res: Response) => {
 })
 
 
+
 router.get('/api/books', async (req: Request, res: Response) => {
     try {
 
         const { genre } = req.query;
         const filterByGenre = genre ? { genre } : {}
-        const books = await Book.find(filterByGenre).sort({ title: -1 }).limit(5)
+        const books = await Book.find(filterByGenre).sort({ title: -1 }).limit(10)
 
-        
-        res.status(201).json({
+
+        res.status(200).json({
             success: true,
             message: "Books retrieved successfully",
             data: books,
 
         })
     } catch (error) {
-        console.log(error)
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to retrieve books"
+        })
     }
 })
 
 router.get('/api/books/:bookId', async (req: Request, res: Response) => {
     try {
-        const query = req.params.bookId;
+        const book = req.params.bookId;
 
-        const singleBook = await Book.findById(query)
-        console.log(singleBook)
-        res.status(201).json({
+        const singleBook = await Book.findById(book)
+
+        res.status(200).json({
             success: true,
             message: "Books retrieved successfully",
             data: singleBook,
@@ -77,13 +81,17 @@ router.put('/api/books/:bookId', async (req: Request, res: Response) => {
             new: true
         })
 
-        res.status(201).json({
+        res.status(200).json({
             success: true,
             message: "Book updated successfully",
             data: updateBook,
         })
     } catch (error: any) {
-        console.log(error.message)
+        res.status(400).json({
+            success: false,
+            message: error.message,
+            error
+        })
     }
 
 })
@@ -105,6 +113,11 @@ router.delete('/api/books/:bookId', async (req: Request, res: Response) => {
         })
     } catch (error) {
         console.log(error)
+        res.status(404).json({
+            success: false,
+            message: "Failed to delete a book",
+        })
+
     }
 
 })

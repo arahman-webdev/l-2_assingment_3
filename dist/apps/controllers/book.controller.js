@@ -18,15 +18,6 @@ const book_model_1 = require("../models/book.model");
 exports.router = express_1.default.Router();
 exports.router.post("/api/books", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        // const newBook = new Book({
-        //     title: "The Theory of Everything",
-        //     author: "Stephen Hawking",
-        //     genre: "SCIENCE",
-        //     isbn: "9780553380163",
-        //     description: "An overview of cosmology and black holes.",
-        //     copies: 5,
-        //     available: true
-        // })
         const newBook = new book_model_1.Book(req.body);
         const savedBook = yield newBook.save();
         res.status(201).json({
@@ -49,7 +40,6 @@ exports.router.get('/api/books', (req, res) => __awaiter(void 0, void 0, void 0,
         const { genre } = req.query;
         const filterByGenre = genre ? { genre } : {};
         const books = yield book_model_1.Book.find(filterByGenre).sort({ title: -1 }).limit(5);
-        console.log(books);
         res.status(201).json({
             success: true,
             message: "Books retrieved successfully",
