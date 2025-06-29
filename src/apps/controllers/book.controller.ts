@@ -16,7 +16,7 @@ router.post("/api/books", async (req: Request, res: Response) => {
             data: savedBook
         })
     } catch (error: any) {
-        
+
         res.status(404).json({
             message: "Validation failed",
             success: false,
@@ -27,28 +27,41 @@ router.post("/api/books", async (req: Request, res: Response) => {
 
 
 
-router.get('/api/books', async (req: Request, res: Response) => {
+
+router.get('/api/books', async (req, res) => {
     try {
+        const { filter, sortBy = 'createdAt', sort = 'desc', limit = '10' } = req.query;
 
-        const { genre } = req.query;
-        const filterByGenre = genre ? { genre } : {}
-        const books = await Book.find(filterByGenre).sort({ title: -1 }).limit(10)
 
+        const filterByGenre = filter ? { genre: filter } : {};
+
+
+        const sortOrder = sort === 'asc' ? 1 : -1;
+
+
+        const resultLimit = parseInt(limit as string) || 10;
+
+        const books = await Book.find(filterByGenre)
+            .sort({ [sortBy as string]: sortOrder })
+            .limit(resultLimit);
 
         res.status(200).json({
             success: true,
             message: "Books retrieved successfully",
-            data: books,
-
-        })
+            data: books
+        });
     } catch (error) {
-
+        console.error("Error fetching books:", error);
         res.status(500).json({
             success: false,
-            message: "Failed to retrieve books"
-        })
+            message: "Internal server error",
+            error
+        });
     }
-})
+});
+
+
+
 
 router.get('/api/books/:bookId', async (req: Request, res: Response) => {
     try {
@@ -75,16 +88,17 @@ router.put('/api/books/:bookId', async (req: Request, res: Response) => {
 
     try {
         const filter = req.params.bookId;
-        const update = { copies: 100 };
+        const updateData = req.body;
 
-        const updateBook = await Book.findByIdAndUpdate(filter, update, {
-            new: true
+        const updatedBook = await Book.findByIdAndUpdate(filter, updateData, {
+            new: true,
+            runValidators: true
         })
 
         res.status(200).json({
             success: true,
             message: "Book updated successfully",
-            data: updateBook,
+            data: updatedBook,
         })
     } catch (error: any) {
         res.status(400).json({
@@ -95,6 +109,9 @@ router.put('/api/books/:bookId', async (req: Request, res: Response) => {
     }
 
 })
+
+
+
 
 
 // remove a book 

@@ -48,6 +48,8 @@ const bookSchema = new mongoose_1.Schema({
 bookSchema.statics.updateQuantity = function (bookId, quantity) {
     return __awaiter(this, void 0, void 0, function* () {
         const book = yield this.findById(bookId);
+        if (!book)
+            throw new Error("Book not found");
         if (book.copies < quantity)
             throw new Error("Not enough copies");
         book.copies = book.copies - quantity;

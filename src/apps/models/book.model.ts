@@ -40,6 +40,8 @@ const bookSchema = new Schema<IBook>({
 // static method applied here
 bookSchema.statics.updateQuantity = async function (bookId: Types.ObjectId, quantity: number) {
   const book = await this.findById(bookId);
+  
+   if (!book) throw new Error("Book not found");
 
   if(book.copies < quantity) throw new Error("Not enough copies")
   

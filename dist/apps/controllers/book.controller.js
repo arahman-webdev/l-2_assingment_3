@@ -27,7 +27,6 @@ exports.router.post("/api/books", (req, res) => __awaiter(void 0, void 0, void 0
         });
     }
     catch (error) {
-        console.log("error from creating post", error);
         res.status(404).json({
             message: "Validation failed",
             success: false,
@@ -37,25 +36,33 @@ exports.router.post("/api/books", (req, res) => __awaiter(void 0, void 0, void 0
 }));
 exports.router.get('/api/books', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { genre } = req.query;
-        const filterByGenre = genre ? { genre } : {};
-        const books = yield book_model_1.Book.find(filterByGenre).sort({ title: -1 }).limit(5);
-        res.status(201).json({
+        const { filter, sortBy = 'createdAt', sort = 'desc', limit = '10' } = req.query;
+        const filterByGenre = filter ? { genre: filter } : {};
+        const sortOrder = sort === 'asc' ? 1 : -1;
+        const resultLimit = parseInt(limit) || 10;
+        const books = yield book_model_1.Book.find(filterByGenre)
+            .sort({ [sortBy]: sortOrder })
+            .limit(resultLimit);
+        res.status(200).json({
             success: true,
             message: "Books retrieved successfully",
-            data: books,
+            data: books
         });
     }
     catch (error) {
-        console.log(error);
+        console.error("Error fetching books:", error);
+        res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error
+        });
     }
 }));
 exports.router.get('/api/books/:bookId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const query = req.params.bookId;
-        const singleBook = yield book_model_1.Book.findById(query);
-        console.log(singleBook);
-        res.status(201).json({
+        const book = req.params.bookId;
+        const singleBook = yield book_model_1.Book.findById(book);
+        res.status(200).json({
             success: true,
             message: "Books retrieved successfully",
             data: singleBook,
@@ -69,18 +76,23 @@ exports.router.get('/api/books/:bookId', (req, res) => __awaiter(void 0, void 0,
 exports.router.put('/api/books/:bookId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const filter = req.params.bookId;
-        const update = { copies: 100 };
-        const updateBook = yield book_model_1.Book.findByIdAndUpdate(filter, update, {
-            new: true
+        const updateData = req.body;
+        const updatedBook = yield book_model_1.Book.findByIdAndUpdate(filter, updateData, {
+            new: true,
+            runValidators: true
         });
-        res.status(201).json({
+        res.status(200).json({
             success: true,
             message: "Book updated successfully",
-            data: updateBook,
+            data: updatedBook,
         });
     }
     catch (error) {
-        console.log(error.message);
+        res.status(400).json({
+            success: false,
+            message: error.message,
+            error
+        });
     }
 }));
 // remove a book 
@@ -96,5 +108,9 @@ exports.router.delete('/api/books/:bookId', (req, res) => __awaiter(void 0, void
     }
     catch (error) {
         console.log(error);
+        res.status(404).json({
+            success: false,
+            message: "Failed to delete a book",
+        });
     }
 }));
